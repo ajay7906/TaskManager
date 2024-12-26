@@ -1,3 +1,5 @@
+const pool = require('../config/database');
+
 const taskController = {
     async createTask(req, res) {
       try {

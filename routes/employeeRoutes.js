@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/userController');
-const taskController = require('../controllers/taskController');
-const authMiddleware = require('../middleware/auth');
+const userController = require('../controllers/userControllers');
+const taskController = require('../controllers/taskControllers');
+const authMiddleware = require('../middleware/authMiddleware');
 const adminAuthMiddleware = require('../middleware/adminAuth');
 
 // Auth routes
