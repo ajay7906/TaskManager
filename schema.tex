@@ -1,0 +1,100 @@
+-- 1. First, let's insert an admin
+INSERT INTO admins (email, password) 
+VALUES ('admin@company.com', 'hashed_password_123');
+
+-- Verify admin insertion
+SELECT * FROM admins;
+
+-- 2. Create some employees
+INSERT INTO employees (first_name, last_name, email, password, phone, created_by) 
+VALUES 
+('John', 'Doe', 'john@company.com', 'hashed_password_456', '1234567890', 1),
+('Jane', 'Smith', 'jane@company.com', 'hashed_password_789', '9876543210', 1),
+('Bob', 'Wilson', 'bob@company.com', 'hashed_password_101', '5555555555', 1);
+
+-- Verify employees
+SELECT * FROM employees;
+
+-- 3. Create some tasks
+INSERT INTO tasks (title, description, priority, created_by, deadline) 
+VALUES 
+('Website Design', 'Create new homepage design', 'high', 1, '2024-12-31'),
+('Database Optimization', 'Optimize database queries', 'medium', 1, '2024-12-25'),
+('Content Writing', 'Write blog posts', 'low', 1, '2024-12-28');
+
+-- Verify tasks
+SELECT * FROM tasks;
+
+-- 4. Assign tasks to employees (multiple scenarios)
+-- Scenario 1: Assign one task to one employee
+INSERT INTO employee_tasks (employee_id, task_id, assigned_by) 
+VALUES (1, 1, 1);
+
+-- Scenario 2: Assign multiple tasks to one employee
+INSERT INTO employee_tasks (employee_id, task_id, assigned_by) 
+VALUES 
+(2, 1, 1),
+(2, 2, 1),
+(2, 3, 1);
+
+-- Scenario 3: Assign one task to multiple employees
+INSERT INTO employee_tasks (employee_id, task_id, assigned_by) 
+VALUES 
+(1, 2, 1),
+(2, 2, 1),
+(3, 2, 1);
+
+-- 5. Test Queries for Different Scenarios
+
+-- Test 1: View all tasks assigned to a specific employee
+SELECT 
+    e.first_name,
+    e.last_name,
+    t.title,
+    t.priority,
+    t.status,
+    t.deadline
+FROM employees e
+JOIN employee_tasks et ON e.employee_id = et.employee_id
+JOIN tasks t ON et.task_id = t.task_id
+WHERE e.employee_id = 2;
+
+-- Test 2: Count number of tasks per employee
+SELECT 
+    e.first_name,
+    e.last_name,
+    COUNT(et.task_id) as task_count
+FROM employees e
+LEFT JOIN employee_tasks et ON e.employee_id = et.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name;
+
+-- Test 3: Find employees with high priority tasks
+SELECT DISTINCT
+    e.first_name,
+    e.last_name,
+    t.title,
+    t.priority
+FROM employees e
+JOIN employee_tasks et ON e.employee_id = et.employee_id
+JOIN tasks t ON et.task_id = t.task_id
+WHERE t.priority = 'high';
+
+-- Test 4: View task assignment history
+SELECT 
+    e.first_name as employee_name,
+    t.title as task_title,
+    a.email as assigned_by,
+    et.assigned_at
+FROM employee_tasks et
+JOIN employees e ON et.employee_id = e.employee_id
+JOIN tasks t ON et.task_id = t.task_id
+JOIN admins a ON et.assigned_by = a.admin_id
+ORDER BY et.assigned_at DESC;
+
+-- Test 5: Update task status
+UPDATE tasks 
+SET status = 'in_progress' 
+WHERE task_id = 1;
+
+-- Verify the status update
+SELECT title, status FROM tasks WHERE task_id = 1;
