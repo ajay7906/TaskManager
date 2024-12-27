@@ -9,7 +9,7 @@ const userController = {
       const { username, password } = req.body;
       const [users] = await pool.execute(
         'SELECT * FROM users WHERE username = ?',
-        [username]
+        [username]   
       );
 
       if (users.length === 0) {
