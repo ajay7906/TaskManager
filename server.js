@@ -58,10 +58,13 @@ const pool = mysql.createPool({
 const secret = process.env.JWT_SECRET || 'default_secret';
 
 
-// Authentication middleware
+// Authentication middleware 
+
+
 const authMiddleware = async (req, res, next) => {
-    try {
-        const token = req.headers.authorization;
+    try { 
+        //handle the token with bearer
+        const token = req.headers.authorization.split(' ')[1]; 
         console.log(token);
         
         if (!token) {
@@ -87,6 +90,11 @@ const authMiddleware = async (req, res, next) => {
 
 
 app.post('/api/login', async (req, res) => {
+
+
+
+
+    
     try {
         const { email, password } = req.body;
        
@@ -124,6 +132,12 @@ app.post('/api/login', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
+
+
+
+
+
+
 });
 
 
@@ -153,6 +167,31 @@ app.post('/api/employees', authMiddleware, async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+//get all employees
+app.get('/api/employees', authMiddleware, async (req, res) => {
+    try {
+        const [employees] = await pool.execute('SELECT * FROM employees');
+        res.json(employees);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+
+
+//get all task
+app.get('/api/task/alltask',authMiddleware, async (req, res)=>{
+    try {
+        const [tasks] = await pool.execute('SELECT * FROM tasks');
+        res.json(tasks);
+        
+    } catch (error) {
+        res.status(500).json({message:'Server Error'}) 
+    }
+})
+
+
 
 // Get employee tasks
 app.get('/api/employee/tasks', authMiddleware, async (req, res) => {
@@ -167,7 +206,7 @@ app.get('/api/employee/tasks', authMiddleware, async (req, res) => {
 
         res.json(tasks);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error' }); 
     }
 });
 
@@ -190,12 +229,10 @@ app.post('/api/tasks', authMiddleware, async (req, res) => {
     }
 });
 
+
+
+
 // Assign task
-
-
-
-
-
 
 
 
